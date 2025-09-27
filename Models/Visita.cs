@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,21 +9,18 @@ namespace PC2.Models
 {
     public class Visita
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
         public int InmuebleId { get; set; }
 
-        [Required]
-        public int UsuarioId { get; set; }
-
-        [Required]
         [DataType(DataType.DateTime)]
-        public DateTime FechaInicio { get; set; }
+        public DateTime? FechaInicio { get; set; }
 
-        [Required]
         [DataType(DataType.DateTime)]
-        public DateTime FechaFin { get; set; }
+        public DateTime? FechaFin { get; set; }
 
         [Required]
         public EstadoVisita Estado { get; set; }

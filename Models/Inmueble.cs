@@ -44,6 +44,10 @@ namespace PC2.Models
         public decimal Precio { get; set; }
 
         public bool Activo { get; set; }
+        public bool ReservaActiva { get; set; }
+
+        // Relación con las reservas (suponiendo que una reserva tiene un campo FechaExpiracion)
+        public virtual ICollection<Reserva> Reservas { get; set; }
     }
 
     public enum TipoInmueble
