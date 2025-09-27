@@ -53,4 +53,5 @@ namespace PC2.Models
         Oficina,
         Local
     }
+
 }
