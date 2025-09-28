@@ -3,3 +3,4 @@ bin/
 *.sln
 wwwroot/
 Data/Migrations/
+.vscode
