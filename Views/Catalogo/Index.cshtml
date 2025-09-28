@@ -1,0 +1,90 @@
+@model CatalogoViewModel
+
+@{
+    ViewData["Title"] = "Catálogo de Inmuebles";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<!-- Formulario de filtros -->
+<form method="get" asp-action="Index">
+    <div class="form-group">
+        <label>Ciudad</label>
+        <input type="text" name="ciudad" value="@Model.Ciudad" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Tipo</label>
+        <select name="tipo" class="form-control">
+            <option value="">Seleccione...</option>
+            @{
+                var tipos = new[] {
+                        new { Valor = TipoInmueble.Departamento, Texto = "Departamento" },
+                        new { Valor = TipoInmueble.Casa, Texto = "Casa" },
+                        new { Valor = TipoInmueble.Oficina, Texto = "Oficina" },
+                        new { Valor = TipoInmueble.Local, Texto = "Local" }
+                        };
+            }
+            @foreach (var t in tipos)
+            {
+                var selected = Model.Tipo == t.Valor ? "selected" : "";
+                <option value="@t.Valor" selected="@selected">@t.Texto</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Precio Min</label>
+        <input type="number" name="precioMin" value="@Model.PrecioMin" class="form-control" step="0.01" min="0" />
+    </div>
+    <div class="form-group">
+        <label>Precio Max</label>
+        <input type="number" name="precioMax" value="@Model.PrecioMax" class="form-control" step="0.01" min="0" />
+    </div>
+    <div class="form-group">
+        <label>Dormitorios >=</label>
+        <input type="number" name="dormitorios" value="@Model.Dormitorios" class="form-control" min="0" />
+    </div>
+    <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+</form>
+
+<!-- Mostrar los inmuebles -->
+<div class="row mt-4">
+    @foreach (var inmueble in Model.Inmuebles)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                @if (!string.IsNullOrEmpty(inmueble.Imagen))
+                {
+                    <img src="@Url.Content(inmueble.Imagen)" class="card-img-top" alt="@inmueble.Titulo">
+                }
+                else
+                {
+                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="Imagen no disponible">
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@inmueble.Titulo</h5>
+                    <p class="card-text">
+                        Tipo: @inmueble.Tipo <br />
+                        Ciudad: @inmueble.Ciudad <br />
+                        Precio: @inmueble.Precio.ToString("C") <br />
+                        Dormitorios: @inmueble.Dormitorios <br />
+                    </p>
+                    <a href="@Url.Action("Detalle", "Catalogo", new { id = inmueble.Id })" class="btn btn-info">Ver
+                        Detalles</a>
+                    <form asp-action="AgendarVisita" method="post" style="display:inline-block;">
+                        <input type="hidden" name="inmuebleId" value="@inmueble.Id" />
+                        <button type="submit" class="btn btn-success">Agendar Visita</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Paginación -->
+<div class="pagination mt-4">
+    @for (int i = 1; i <= (Model.TotalInmuebles + Model.PageSize - 1) / Model.PageSize; i++)
+    {
+        <a href="@Url.Action("Index", new { pageNumber = i, ciudad = Model.Ciudad, tipo = Model.Tipo, precioMin = Model.PrecioMin, precioMax = Model.PrecioMax, dormitorios = Model.Dormitorios })"
+            class="btn btn-link">@i</a>
+    }
+</div>
