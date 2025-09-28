@@ -14,7 +14,7 @@ namespace PC2.Models
         public int InmuebleId { get; set; }
 
         [Required]
-        public int UsuarioId { get; set; }
+        public string UsuarioId { get; set; }
 
         [Required]
         [DataType(DataType.DateTime)]
