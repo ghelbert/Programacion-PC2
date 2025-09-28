@@ -11,8 +11,8 @@ namespace PC2.Controllers
     {
         private readonly ILogger<CatalogoController> _logger;
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
-        public CatalogoController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, ILogger<CatalogoController> logger)
+        private readonly UserManager<Usuario> _userManager;
+        public CatalogoController(ApplicationDbContext context, UserManager<Usuario> userManager, ILogger<CatalogoController> logger)
         {
             _context = context;
             _userManager = userManager;
@@ -86,110 +86,82 @@ namespace PC2.Controllers
             {
                 return NotFound();
             }
-
+            InmuebleVisitaViewModel model = new InmuebleVisitaViewModel();
             // Verificar si existe una reserva activa
             bool tieneReservaActiva = inmueble.Reservas.Any(r => r.FechaExpiracion > DateTime.Now);
-
-            // Crear el ViewModel con los datos del inmueble y las fechas predeterminadas para la visita
-            var viewModel = new InmuebleVisitaViewModel
-            {
-                Inmueble = inmueble,
-                FechaInicio = DateTime.Now,  // Fecha de inicio por defecto (actual)
-                FechaFin = DateTime.Now.AddHours(1),  // Fecha de fin por defecto (una hora después)
-                Notas = string.Empty  // Notas vacías por defecto
-            };
-
+            inmueble.ReservaActiva = tieneReservaActiva;
+            model.Inmueble = inmueble;
             // Pasar el ViewModel a la vista
-            return View(viewModel);
-        }
-        [HttpGet]
-        public async Task<IActionResult> AgendarVisita(int id)
-        {
-            var inmueble = await _context.Inmuebles
-                .Include(i => i.Reservas)
-                .FirstOrDefaultAsync(i => i.Id == id);
-
-            if (inmueble == null)
-            {
-                return NotFound();
-            }
-
-            var model = new InmuebleVisitaViewModel
-            {
-                Inmueble = inmueble,
-                FechaInicio = DateTime.Now,
-                FechaFin = DateTime.Now.AddHours(1),
-                Notas = string.Empty
-            };
-
             return View(model);
         }
+
         [HttpPost]
-        public async Task<IActionResult> AgendarVisita(InmuebleVisitaViewModel model)
+        public async Task<IActionResult> AgendarVisita(VisitaViewModel model2)
         {
+            _logger.LogInformation("Buscando Inmueble con ID: {InmuebleId}", model2.InmuebleId);
+            var inmueble = await _context.Inmuebles
+                .FirstOrDefaultAsync(i => i.Id == model2.InmuebleId);
+
             // Obtener inmuebleId del formulario
             if (!int.TryParse(Request.Form["inmuebleId"], out var inmuebleId))
             {
                 _logger.LogWarning("ID de inmueble no válido.");
                 ModelState.AddModelError("", "El ID del inmueble no es válido.");
-                return View(model);
+                return View("Detalle", inmueble);
             }
 
             // Cargar el Inmueble desde la base de datos
-            _logger.LogInformation("Buscando Inmueble con ID: {InmuebleId}", inmuebleId);
-            var inmueble = await _context.Inmuebles
-                .FirstOrDefaultAsync(i => i.Id == inmuebleId);
 
             if (inmueble == null)
             {
                 _logger.LogWarning("Inmueble con ID {InmuebleId} no encontrado.", inmuebleId);
                 ModelState.AddModelError("", "El inmueble no existe.");
-                return View(model);
+                return View("Detalle", inmueble);
             }
 
-            // Asignar el inmueble al modelo para la vista
-            model.Inmueble = inmueble;
-
+            // Asignar el inmueble al model2o para la vista
+            InmuebleVisitaViewModel model22 = new();
             // Inicializar propiedades si son null
-            model.FechaInicio ??= DateTime.Now;
-            model.FechaFin ??= DateTime.Now.AddHours(1);
-            model.Notas ??= string.Empty;
+            model22.Inmueble = inmueble;
+            model22.FechaInicio = model2.FechaInicio;
+            model22.FechaFin = model2.FechaFin;
+            model22.Notas = model2.Notas;
 
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("ModelState no válido: {Errors}", string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
-                return View(model);
+                return View("Detalle", model22);
             }
 
-            // Verificar fechas
-            if (model.FechaInicio >= model.FechaFin)
+
+            if (model22.FechaInicio >= model22.FechaFin)
             {
                 _logger.LogWarning("Fecha de inicio no es anterior a la fecha de fin.");
                 ModelState.AddModelError("", "La fecha de inicio debe ser anterior a la fecha de fin.");
-                return View(model);
+                return View("Detalle", model22);
             }
 
             // Verificar visitas solapadas
             _logger.LogInformation("Verificando visitas solapadas para InmuebleId: {InmuebleId}", inmuebleId);
             bool hayVisitaSolapada = _context.Visitas
-                .Any(v => v.InmuebleId == inmuebleId &&
-                          v.FechaInicio < model.FechaFin.Value &&
-                          v.FechaFin > model.FechaInicio.Value);
+                .Any(v =>
+                          v.FechaInicio < model22.FechaFin &&
+                          v.FechaFin > model22.FechaInicio);
 
             if (hayVisitaSolapada)
             {
                 _logger.LogWarning("Visita solapada encontrada.");
                 ModelState.AddModelError("", "Ya existe una visita solapada en el intervalo de fechas.");
-                return View(model);
+                return View("Detalle", model22);
             }
 
             // Crear la visita
             var visita = new Visita
             {
                 InmuebleId = inmuebleId,
-                FechaInicio = model.FechaInicio.Value,
-                FechaFin = model.FechaFin.Value,
-                Notas = model.Notas,
+                FechaInicio = model22.FechaInicio,
+                FechaFin = model22.FechaFin,
+                Notas = model22.Notas,
                 Estado = EstadoVisita.Solicitada
             };
 
@@ -205,7 +177,7 @@ namespace PC2.Controllers
             {
                 _logger.LogError(ex, "Error al guardar la visita.");
                 ModelState.AddModelError("", $"Error al guardar la visita: {ex.Message}");
-                return View(model);
+                return View("Detalle", model22);
             }
 
             TempData["SuccessMessage"] = "La visita ha sido agendada correctamente.";

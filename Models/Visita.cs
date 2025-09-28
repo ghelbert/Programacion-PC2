@@ -24,10 +24,9 @@ namespace PC2.Models
 
         [Required]
         public EstadoVisita Estado { get; set; }
-
+        [Required]
         public string Notas { get; set; }
 
-        // Restricción: FechaInicio debe ser antes de FechaFin
         public bool EsFechaValida()
         {
             return FechaInicio < FechaFin;

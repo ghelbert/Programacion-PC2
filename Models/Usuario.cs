@@ -6,9 +6,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace PC2.Models
 {
-    public class ApplicationUser : IdentityUser
+    public class Usuario : IdentityUser
     {
         // Puedes agregar propiedades adicionales si es necesario, por ejemplo:
-        public string NombreCompleto { get; set; }
     }
 }
