@@ -132,6 +132,18 @@ namespace PC2.Controllers
                 _logger.LogWarning("ModelState no válido: {Errors}", string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
                 return View("Detalle", model22);
             }
+            TimeSpan horaInicioPermitida = new TimeSpan(8, 0, 0);  // 08:00
+            TimeSpan horaFinPermitida = new TimeSpan(19, 0, 0);    // 19:00
+
+            TimeSpan horaInicio = model22.FechaInicio.Value.TimeOfDay;
+            TimeSpan horaFin = model22.FechaFin.Value.TimeOfDay;
+
+            if (horaInicio < horaInicioPermitida || horaFin > horaFinPermitida)
+            {
+                _logger.LogWarning("La visita está fuera del horario laboral (08:00–19:00).");
+                ModelState.AddModelError("", "Las visitas deben programarse entre las 08:00 y las 19:00.");
+                return View("Detalle", model22);
+            }
 
 
             if (model22.FechaInicio >= model22.FechaFin)
