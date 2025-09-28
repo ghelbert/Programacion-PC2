@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PC2.Data;
 
@@ -10,9 +11,11 @@ using PC2.Data;
 namespace PC2.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250927011814_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
@@ -64,6 +67,70 @@ namespace PC2.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -189,9 +256,6 @@ namespace PC2.Data.Migrations
                     b.Property<decimal>("Precio")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("ReservaActiva")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("Tipo")
                         .HasColumnType("INTEGER");
 
@@ -217,7 +281,6 @@ namespace PC2.Data.Migrations
                             Imagen = "https://tse4.mm.bing.net/th/id/OIP.RN2FM_PYPFBQL-UxY03gaQHaE8?rs=1&pid=ImgDetMain&o=7&rm=3",
                             MetrosCuadrados = 85.5,
                             Precio = 200000m,
-                            ReservaActiva = false,
                             Tipo = 0,
                             Titulo = "Departamento Moderno"
                         },
@@ -233,7 +296,6 @@ namespace PC2.Data.Migrations
                             Imagen = "https://tse4.mm.bing.net/th/id/OIP.JNgdoxHcMPEFZm-MzpH1tgHaFL?rs=1&pid=ImgDetMain&o=7&rm=3",
                             MetrosCuadrados = 200.0,
                             Precio = 450000m,
-                            ReservaActiva = false,
                             Tipo = 1,
                             Titulo = "Casa de Lujo"
                         },
@@ -245,11 +307,10 @@ namespace PC2.Data.Migrations
                             Ciudad = "Valencia",
                             Codigo = "INM-003",
                             Direccion = "Carrer del Mar, 1",
-                            Dormitorios = 2,
+                            Dormitorios = 0,
                             Imagen = "https://www.rescombuilds.com/wp-content/uploads/2022/06/3-exquisicare-senior-living-210415112025-78.jpg",
                             MetrosCuadrados = 120.0,
                             Precio = 150000m,
-                            ReservaActiva = false,
                             Tipo = 2,
                             Titulo = "Oficina Comercial"
                         },
@@ -261,11 +322,10 @@ namespace PC2.Data.Migrations
                             Ciudad = "Sevilla",
                             Codigo = "INM-004",
                             Direccion = "Calle San Pedro, 8",
-                            Dormitorios = 1,
+                            Dormitorios = 0,
                             Imagen = "https://www.rescombuilds.com/wp-content/uploads/2022/06/3-exquisicare-senior-living-210415112025-78.jpg",
                             MetrosCuadrados = 90.0,
                             Precio = 180000m,
-                            ReservaActiva = false,
                             Tipo = 3,
                             Titulo = "Local Comercial"
                         });
@@ -286,79 +346,12 @@ namespace PC2.Data.Migrations
                     b.Property<int>("InmuebleId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("UsuarioId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("InmuebleId");
 
                     b.ToTable("Reservas");
-                });
-
-            modelBuilder.Entity("PC2.Models.Usuario", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("PC2.Models.Visita", b =>
@@ -370,10 +363,10 @@ namespace PC2.Data.Migrations
                     b.Property<int>("Estado")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("FechaFin")
+                    b.Property<DateTime>("FechaFin")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("FechaInicio")
+                    b.Property<DateTime>("FechaInicio")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("InmuebleId")
@@ -382,6 +375,9 @@ namespace PC2.Data.Migrations
                     b.Property<string>("Notas")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -399,7 +395,7 @@ namespace PC2.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("PC2.Models.Usuario", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -408,7 +404,7 @@ namespace PC2.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("PC2.Models.Usuario", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -423,7 +419,7 @@ namespace PC2.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("PC2.Models.Usuario", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -432,25 +428,11 @@ namespace PC2.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("PC2.Models.Usuario", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("PC2.Models.Reserva", b =>
-                {
-                    b.HasOne("PC2.Models.Inmueble", null)
-                        .WithMany("Reservas")
-                        .HasForeignKey("InmuebleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("PC2.Models.Inmueble", b =>
-                {
-                    b.Navigation("Reservas");
                 });
 #pragma warning restore 612, 618
         }
